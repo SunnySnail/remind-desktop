@@ -35,7 +35,7 @@ if (
   process.env.NODE_ENV === 'development' ||
   process.env.DEBUG_PROD === 'true'
 ) {
-  // require('electron-debug')();
+  require('electron-debug')();
 }
 
 const installExtensions = async () => {
@@ -56,11 +56,13 @@ const createWindow = async () => {
     await installExtensions();
   }
 
+  console.log(path.join(__dirname, '../../resources/icon.png'));
+
   mainWindow = new BrowserWindow({
     show: false,
     width: 600,
     height: 400,
-    icon: '',
+    icon: path.join(__dirname, '../../resources/icon.png'),
     webPreferences:
       (process.env.NODE_ENV === 'development' ||
         process.env.E2E_BUILD === 'true') &&
@@ -69,7 +71,7 @@ const createWindow = async () => {
             nodeIntegration: true,
           }
         : {
-            preload: path.join(__dirname, 'dist/renderer.prod.js'),
+            preload: path.join(__dirname, 'renderer.prod.js'),
           },
   });
   const url = path.join(__dirname, '..', '/app.html');
@@ -113,6 +115,10 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+if (process.env.NODE_ENV === 'development') {
+  app.dock.setIcon(path.join(__dirname, '../../resources/icon.png'));
+}
 
 if (process.env.E2E_BUILD === 'true') {
   // eslint-disable-next-line promise/catch-or-return
